@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 export default function TodoList() {
   const [inputList, setInputList] = React.useState([]);
+  const [user, setUser] = React.useState("")
 
   const BASE_URL = "https://assets.breatheco.de/apis/fake/todos/";
 
@@ -9,8 +10,13 @@ export default function TodoList() {
     if (event.keyCode === 13) {
       event.preventDefault();
       let arrayAux = inputList.slice();
-      arrayAux.push(event.target.value);
+      console.log(arrayAux)
+      arrayAux.push({
+        label: event.target.value,
+        done: false
+      });
       setInputList(arrayAux);
+
     }
   }
 
@@ -21,28 +27,85 @@ export default function TodoList() {
   }
 
   const getTodoListFromApi = async ()=>{
-    let URI = `${BASE_URL}user/LATAM2020`;
+    let URI = `${BASE_URL}user/${user}`;
     let response = await fetch (URI)
+    try{
+      if (response.ok){
+        let jsonResponse = await response.json()
+        console.log(jsonResponse)
+        setInputList(jsonResponse)
+      }else{
+        alert("User does not exist")
+        setInputList([])
+        return
+      }
+
+    }catch { e => console.log(e)}
+  }
+
+  useEffect(()=>{
+    getTodoListFromApi
+  },[user])
+
+  const createUserFromApi = async ()=>{
+    let URI = `${BASE_URL}user/${user}`;
+    try{
+    let response = await fetch (URI,{
+      method:"POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify([]),
+    })
+    if(response.ok){
+      let jsonResponse = await response.json()
+      console.log(jsonResponse)
+      alert(`User -${user}- was created`)
+    }else{
+      alert("User already exists")
+    }
+
+    }catch (e){
+      alert("Something went wrong. Check console")
+      console.log(e)
+    }
+  }
+  const addTodoFromApi = async (event) =>{
+    let URI = `${BASE_URL}user/${user}`;
+    let arrAux = inputList.slice()
+    arrAux.push({
+      label: event.target.value,
+      done: false
+    })
+    setInputList(arrAux)
+    let response = await fetch(URI, {
+      method:"PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(arrAux),
+    })
+
     let jsonResponse = await response.json()
     console.log(jsonResponse)
-    setInputList(jsonResponse)
-  }
-/*
-  useEffect(()=>{
-    console.log("Here")
-    getTodoListFromApi
-  },[])*/
 
+  }
+  
   return (
     <>
       <div className="todo_container">
         <h1 className="user_header">User</h1>
-        <input placeholder="Create an user" type="text" />
+        <input 
+        placeholder="Create an user" 
+        type="text"
+        onChange={(event)=>{
+          let newUser = event.target.value;
+          setUser(newUser);
+          
+       }
+ }
+        />
 
         <div className="Button">
-          <button type="button">Create user</button>
+          <button onClick={createUserFromApi} type="button">Create user</button>
           <button onClick={getTodoListFromApi} type="button">Get Todo List</button>
-          <button type="button">Add todo</button>
+          <button onClick={addTodoFromApi} type="button">Add todo</button>
         </div>
 
         <h1 className="todo_header">Todos</h1>
@@ -59,7 +122,7 @@ export default function TodoList() {
             {inputList.map((todo, index) => {
               return (
                 <li className="todo-list" key={index}>
-                  {todo}
+                  {todo.label}
                   <i
                     className="fa-sharp fa-solid fa-x"
                     onClick={(e) => {
