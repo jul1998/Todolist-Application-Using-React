@@ -27,11 +27,11 @@ export default function TodoList() {
     console.log(jsonResponse)
     setInputList(jsonResponse)
   }
-/*
+
   useEffect(()=>{
     console.log("Here")
     getTodoListFromApi
-  },[])*/
+  },[])
 
   return (
     <>
@@ -59,7 +59,8 @@ export default function TodoList() {
             {inputList.map((todo, index) => {
               return (
                 <li className="todo-list" key={index}>
-                  {todo}
+                  {todo.label}
+                  This is a change
                   <i
                     className="fa-sharp fa-solid fa-x"
                     onClick={(e) => {
