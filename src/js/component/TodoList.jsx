@@ -90,23 +90,6 @@ export default function TodoList() {
   return (
     <>
       <div className="todo_container">
-        <h1 className="user_header">User</h1>
-        <input 
-        placeholder="Create an user" 
-        type="text"
-        onChange={(event)=>{
-          let newUser = event.target.value;
-          setUser(newUser);
-          
-       }
- }
-        />
-
-        <div className="Button">
-          <button onClick={createUserFromApi} type="button">Create user</button>
-          <button onClick={getTodoListFromApi} type="button">Get Todo List</button>
-          <button onClick={addTodoFromApi} type="button">Add todo</button>
-        </div>
 
         <h1 className="todo_header">Todos</h1>
 
